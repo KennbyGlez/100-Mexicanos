@@ -45,6 +45,18 @@ h1 {
   color: gold;
 }
 
+.turnoBox {
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(255, 215, 0, 0.15);
+  border: 2px solid gold;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  color: gold;
+}
+
 .question {
   background: linear-gradient(90deg, gold, orange);
   color: black;
@@ -149,13 +161,16 @@ button {
 
 <div class="container">
 
-  <!-- PANEL -->
   <div class="panel">
     <h2>Equipo 1</h2>
     <div class="score" id="score1">0</div>
 
     <h2>Equipo 2</h2>
     <div class="score" id="score2">0</div>
+
+    <div class="turnoBox" id="turnoBox">
+      🔥 Turno actual: Equipo 1
+    </div>
 
     <hr>
 
@@ -167,9 +182,9 @@ button {
     </div>
 
     <button class="red" onclick="addError()">Error</button>
+    <button class="blue" onclick="resetErrors()">Reiniciar errores</button>
   </div>
 
-  <!-- JUEGO -->
   <div>
 
     <div class="question" id="question">
@@ -189,7 +204,6 @@ button {
 </div>
 
 <script>
-// ---------------- DATA ----------------
 const questions = [
   {
     q: "Menciona algo que haces al despertar",
@@ -222,7 +236,6 @@ let score2 = 0;
 let team = 1;
 let errors = 0;
 
-// ---------------- AUDIO SIMPLE ----------------
 function beep(freq){
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const o = ctx.createOscillator();
@@ -235,7 +248,10 @@ function beep(freq){
   o.stop(ctx.currentTime + 0.2);
 }
 
-// ---------------- INIT ----------------
+function updateTurno(){
+  document.getElementById("turnoBox").innerText = "🔥 Turno actual: Equipo " + team;
+}
+
 function loadQuestion(){
   const q = questions[qIndex];
   document.getElementById("question").innerText = q.q;
@@ -285,17 +301,21 @@ function sumPoints(){
 
 function switchTeam(){
   team = team === 1 ? 2 : 1;
+  updateTurno();
   beep(300);
 }
 
 function addError(){
   if(errors >= 3) return;
   errors++;
-
-  const container = document.getElementById("errors");
-  container.children[errors-1].style.opacity = 1;
-
+  updateErrors();
   beep(150);
+}
+
+function resetErrors(){
+  errors = 0;
+  updateErrors();
+  beep(400);
 }
 
 function nextQuestion(){
@@ -310,8 +330,10 @@ function resetGame(){
   score2 = 0;
   errors = 0;
   qIndex = 0;
+  team = 1;
   updateScores();
   updateErrors();
+  updateTurno();
   loadQuestion();
 }
 
@@ -326,7 +348,6 @@ function updateErrors(){
   });
 }
 
-// ---------------- START ----------------
 setTimeout(()=>{
   document.getElementById("intro").style.display = "none";
 }, 2000);
@@ -334,7 +355,7 @@ setTimeout(()=>{
 loadQuestion();
 updateScores();
 updateErrors();
-
+updateTurno();
 </script>
 
 </body>
